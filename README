@@ -1,0 +1,14 @@
+Install Dependencies:
+
+    sudo apt install cmake build-essential libgl1-mesa-dev libglew-dev libglm-dev libglfw3-dev
+
+Build:
+
+    cmake .
+    make -j$(nproc)
+    
+Run:
+	./dragonblockslauncher
+
+Controls:
+    W, A, S, D, Space, Left Shift
