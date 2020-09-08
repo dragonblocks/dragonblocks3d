@@ -5,7 +5,7 @@ namespace dragonblocks
 	class Mainmenu
 	{
 		public:
-		Mainmenu();
+		void start();
 	};
 } 
  

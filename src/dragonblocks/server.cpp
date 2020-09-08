@@ -3,7 +3,7 @@
 
 using namespace dragonblocks;
 
-Server::Server()
+void Server::start()
 {
 	log("Server is not available yet.");
 }

@@ -1,10 +1,11 @@
-#include <iostream>
 #include <string>
 #include "gldebug.hpp" 
+#include "log.hpp" 
 
 using namespace std;
+using namespace dragonblocks;
 
-GLenum glCheckError_(const char *file, int line)
+GLenum dragonblocks::checkGLError(const char *file, int line)
 {
     GLenum errorCode;
     if ((errorCode = glGetError()) != GL_NO_ERROR)
@@ -20,7 +21,7 @@ GLenum glCheckError_(const char *file, int line)
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        cout << error << " | " << file << " (" << line << ")" << endl;
+		log(string("OpenGL Error: ") + error + " | " + file + " (" + ")");
     }
     return errorCode;
 }

@@ -6,24 +6,26 @@ using namespace dragonblocks;
 
 void Scene::add(Mesh *m)
 {
-	list[m] = true;
+	meshes.insert(m);
 }
 
 void Scene::remove(Mesh *m)
 {
-	list.erase(m);
+	meshes.erase(m);
 }
 
 void Scene::render(double dtime, ShaderProgram *shader_program)
 {
-	for (auto it = list.begin(); it != list.end(); it++) {
-		it->first->render(dtime, shader_program);
+	auto renderlist = meshes;
+	for (auto it = renderlist.begin(); it != renderlist.end(); it++) {
+		Mesh *mesh = *it;
+		mesh->render(dtime, shader_program);
 	}
 }
 
 void Scene::clear()
 {
-	list.clear();
+	meshes.clear();
 }
 
 Scene::~Scene()

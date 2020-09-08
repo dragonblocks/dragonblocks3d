@@ -11,7 +11,7 @@ namespace dragonblocks
 	class BlockDef;
 	class Block;
 	class Mapgen;
-	class MeshGenThread;
+	class MeshGenMgr;
 	class Scene;
 	
 	class Map
@@ -29,13 +29,13 @@ namespace dragonblocks
 		Chunk *getChunk(const glm::ivec3 &);
 		void clear();
 		
-		Map(Mapgen *, MeshGenThread *, Scene *);
+		Map(Mapgen *, MeshGenMgr *, Scene *);
 		~Map();
 		
 		private:
 		std::map<uint16_t, Chunk*> chunks;
 		Mapgen *mapgen;
-		MeshGenThread *mesh_gen_thread;
+		MeshGenMgr *mesh_gen_mgr;
 		Scene *scene;
 	};
 }

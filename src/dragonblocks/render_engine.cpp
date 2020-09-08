@@ -6,7 +6,7 @@
 #include "gldebug.hpp"
 #include "input_handler.hpp"
 #include "map.hpp"  						// this one three
-#include "mesh_gen_thread.hpp"
+#include "mesh_gen_mgr.hpp"
 #include "render_engine.hpp"
 #include "scene.hpp"
 #include "shader_program.hpp"
@@ -15,15 +15,6 @@
 using namespace std;
 using namespace glm;
 using namespace dragonblocks;
-
-RenderEngine *RenderEngine::singleton = nullptr;
-
-RenderEngine *RenderEngine::create()
-{
-	if (singleton)
-		throw runtime_error("RenderEngine already exists");
-	return singleton = new RenderEngine;
-}
 
 void RenderEngine::render()
 {
@@ -59,7 +50,6 @@ void RenderEngine::loop()
 {
 	while (! window->shouldClose()) {
 		render();
-		mesh_gen_thread->step();
 		loadChunks();
 	}
 }
@@ -94,16 +84,6 @@ void RenderEngine::setFov(double f)
 	updateProjectionMatrix();
 }
 
-RenderEngine::~RenderEngine()
-{
-	delete window;
-	delete camera;
-	delete input_handler;
-	delete mesh_gen_thread;
-	delete scene;
-	delete shader_program;
-}
-
 RenderEngine::RenderEngine()
 {
 	if (! glfwInit())
@@ -115,7 +95,7 @@ RenderEngine::RenderEngine()
 	window = Window::create(this);
 	camera = new Camera;
 	input_handler = new InputHandler(camera, window);
-	mesh_gen_thread = new MeshGenThread;
+	mesh_gen_mgr = new MeshGenMgr;
 	scene = new Scene;
 	
 	GLenum glew_init_err = glewInit();
@@ -129,4 +109,14 @@ RenderEngine::RenderEngine()
 	setFov(45);
 	
 	last_time = glfwGetTime();
+}
+
+RenderEngine::~RenderEngine()
+{
+	delete window;
+	delete camera;
+	delete input_handler;
+	delete mesh_gen_mgr;
+	delete scene;
+	delete shader_program;
 }

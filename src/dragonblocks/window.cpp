@@ -80,6 +80,11 @@ bool Window::wasKeyDown(int key) const
 	return glfwGetKey(id, key) == GLFW_PRESS;
 }
 
+void Window::makeContextCurrent() const
+{
+	glfwMakeContextCurrent(id);
+}
+
 ivec2 Window::getSize() const
 {
 	return ivec2(width, height);
@@ -141,7 +146,7 @@ Window::Window(RenderEngine *r) : render_engine(r)
 		glfwTerminate();
 		throw runtime_error("Failed to create GLFW window");
 	}
-	glfwMakeContextCurrent(id);
+	makeContextCurrent();
 	glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetWindowPosCallback(id, Window::windowPosCallback);
 	glfwSetFramebufferSizeCallback(id, Window::framebufferSizeCallback);

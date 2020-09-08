@@ -20,10 +20,11 @@ void InputHandler::processMouseInput(double dtime)
 
 void InputHandler::processKeyInput(double dtime)
 {
-	map<int, bool> keysDown;
+	set<int> keysDown;
 	for (auto it = listened_keys.begin(); it != listened_keys.end(); it++) {
-		if (window->wasKeyDown(it->first)) {
-			keysDown[it->first] = true;
+		int key = *it;
+		if (window->wasKeyDown(key)) {
+			keysDown.insert(key);
 		}
 	}
 	onKeyPress(dtime, keysDown);
@@ -33,10 +34,11 @@ void InputHandler::onMouseMove(double dtime, double x, double y)
 {
 	yaw += x;
 	pitch -= y;
+	pitch = clamp(pitch, -89.0, 89.0);
 	camera->update(yaw, pitch);
 }
 
-void InputHandler::onKeyPress(double dtime, map<int, bool> keysDown)
+void InputHandler::onKeyPress(double dtime, set<int> keys)
 {
 	vec3 vel = vec3(speed * dtime);
 	vec3 front = camera->front(), right = camera->right(), up = camera->up();
@@ -44,26 +46,26 @@ void InputHandler::onKeyPress(double dtime, map<int, bool> keysDown)
 		front = normalize(vec3(front.x, 0, front.z));
 		up = normalize(vec3(0, up.y, 0));
 	}
-	if (keysDown[GLFW_KEY_W]) {
+	if (keys.find(GLFW_KEY_W) != keys.end()) {
 		camera->pos += vel * front;
-	} else if (keysDown[GLFW_KEY_S]) {
+	} else if (keys.find(GLFW_KEY_S) != keys.end()) {
 		camera->pos -= vel * front;
 	}
-	if (keysDown[GLFW_KEY_D]) {
+	if (keys.find(GLFW_KEY_D) != keys.end()) {
 		camera->pos += vel * right;
-	} else if (keysDown[GLFW_KEY_A]) {
+	} else if (keys.find(GLFW_KEY_A) != keys.end()) {
 		camera->pos -= vel * right;
 	}
-	if (keysDown[GLFW_KEY_SPACE]) {
+	if (keys.find(GLFW_KEY_SPACE) != keys.end()) {
 		camera->pos += vel * up;
-	} else if (keysDown[GLFW_KEY_LEFT_SHIFT]) {
+	} else if (keys.find(GLFW_KEY_LEFT_SHIFT) != keys.end()) {
 		camera->pos -= vel * up;
 	}	
 }
 
 void InputHandler::listenFor(int key)
 {
-	listened_keys[key] = true;
+	listened_keys.insert(key);
 }
 
 void InputHandler::dontListenFor(int key)

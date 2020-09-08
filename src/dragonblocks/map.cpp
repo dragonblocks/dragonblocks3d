@@ -1,5 +1,4 @@
 #include <stdexcept>
-#include "face_dir.hpp"
 #include "map.hpp"
 #include "mapgen.hpp"
 
@@ -9,17 +8,17 @@ using namespace dragonblocks;
 
 ivec3 Map::getChunkPos(const vec3 &p)
 {
-	return floor(p / 16.0F);
+	return floor(p / (float)DRAGONBLOCKS_CHUNK_SIZE);
 }
 
 ivec3 Map::getBlockPos(const ivec3 &p)
 {
-	return ((p % 16) + ivec3(16)) % 16;
+	return ((p % DRAGONBLOCKS_CHUNK_SIZE) + ivec3(DRAGONBLOCKS_CHUNK_SIZE)) % DRAGONBLOCKS_CHUNK_SIZE;
 }
 
 uint16_t Map::getChunkPosHash(const ivec3 &p)
 {
-	return (uint16_t)p.x + (uint16_t)p.y * 1000 + (uint16_t)p.z * 1000000;
+	return (uint16_t)p.x + (uint16_t)p.y * DRAGONBLOCKS_MAP_SIZE + (uint16_t)p.z * DRAGONBLOCKS_MAP_SIZE * DRAGONBLOCKS_MAP_SIZE;
 }
 
 const Block *Map::getBlock(const glm::ivec3 &p)
@@ -29,17 +28,6 @@ const Block *Map::getBlock(const glm::ivec3 &p)
 	if (chunk)
 		return chunk->getBlock(Map::getBlockPos(p));
 	return nullptr;
-}
-
-const Block *Map::getBlockRelativePos(Chunk *chunk, const glm::ivec3 &p)
-{
-	const Block *b = nullptr;
-	try {
-		b = chunk->getBlock(p);
-	} catch (std::out_of_range &) {
-		b = getBlock(chunk->pos * 16 + p);
-	}
-	return b;
 }
 
 void Map::setBlock(const glm::ivec3 &p, BlockDef *def)
@@ -56,12 +44,7 @@ void Map::createChunk(const glm::ivec3 &p, const Chunk::Data &data)
 	if (chunks[poshash])
 		return;
 
-	chunks[poshash] = new Chunk(this, p, data, mesh_gen_thread, scene);
-	
-	for (int i = 0; i < 6; i++) {
-		if (Chunk *neighbor = getChunk(p + face_dir[i]))
-			neighbor->addMeshUpdateTask();
-	}
+	chunks[poshash] = new Chunk(this, p, data, mesh_gen_mgr, scene);
 }
 
 void Map::createChunk(const glm::ivec3 &p)
@@ -82,7 +65,7 @@ void Map::clear()
 	chunks.clear();
 }
 
-Map::Map(Mapgen *m, MeshGenThread *mgt, Scene *s) : mapgen(m), mesh_gen_thread(mgt), scene(s)
+Map::Map(Mapgen *m, MeshGenMgr *mgt, Scene *s) : mapgen(m), mesh_gen_mgr(mgt), scene(s)
 {
 }
 

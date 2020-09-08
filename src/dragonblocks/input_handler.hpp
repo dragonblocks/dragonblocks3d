@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <set>
 #include "gl.hpp"
 
 namespace dragonblocks
@@ -15,7 +15,7 @@ namespace dragonblocks
 		void processMouseInput(double);
 		void processKeyInput(double);
 		void onMouseMove(double, double, double);
-		void onKeyPress(double, std::map<int, bool>);
+		void onKeyPress(double, std::set<int>);
 		void listenFor(int);
 		void dontListenFor(int);
 		
@@ -29,6 +29,6 @@ namespace dragonblocks
 		private:		
 		Camera *camera;
 		Window *window;
-		std::map<int, bool> listened_keys;
+		std::set<int> listened_keys;
 	};
 }

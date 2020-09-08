@@ -15,6 +15,8 @@ namespace dragonblocks
 		Mapgen *mapgen;
 		RenderEngine *render_engine;
 		
+		void start();
+		
 		Client();
 		~Client();
 	};

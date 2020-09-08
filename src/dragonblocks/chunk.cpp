@@ -3,6 +3,7 @@
 #include "chunk.hpp" 
 #include "cube.hpp"
 #include "face_dir.hpp" 
+#include "log.hpp" 
 #include "map.hpp" 
 #include "mesh.hpp" 
 #include "texture.hpp" 
@@ -29,7 +30,7 @@ const Block *Chunk::getBlockNoEx(const ivec3 &pos) const
 {
 	try {
 		return getBlock(pos);
-	} catch (std::out_of_range &) {
+	} catch (out_of_range &) {
 		return nullptr;
 	}
 }
@@ -44,14 +45,38 @@ void Chunk::setBlockNoEx(const ivec3 &pos, const Block &block)
 {
 	try {
 		setBlock(pos, block);
-	} catch (std::out_of_range &) {
+	} catch (out_of_range &) {
+	}
+}
+
+void Chunk::addMeshUpdateTask()
+{
+	mesh_gen_mgr->addTask(this);
+}
+
+void Chunk::addMeshUpdateTaskWithEdge()
+{
+	addMeshUpdateTask();
+	for (int i = 0; i < 6; i++) {
+		if (Chunk *neighbor = map->getChunk(pos + face_dir[i])) {
+			neighbor->addMeshUpdateTask();
+		}
 	}
 }
 
 void Chunk::updateMesh()
 {
-	std::vector<GLfloat> vertices;
-	std::vector<Texture> textures;
+	log(string("Update Chunk Mesh at ") + to_string(pos.x) + " " + to_string(pos.y) +  " " + to_string(pos.z));
+		
+	if (mesh_created && ! effect_finished)
+		return;
+	
+	bool mesh_created_before = mesh_created;
+	mesh_created = true;
+	
+	vector<GLfloat> vertices;
+	vector<Texture> textures;
+	bool any_drawable_block = false;
 	
 	for (int x = 0; x < SIZE; x++) {
 		for (int y = 0; y < SIZE; y++) {
@@ -60,11 +85,19 @@ void Chunk::updateMesh()
 				BlockDef *def = block->getDef();
 				if (! def->drawable)
 					continue;
-				vec3 pos(x, y, z);
-				vec3 pos_from_mesh_origin = pos - vec3(SIZE / 2 + 0.5);
+				ivec3 bpos(x, y, z);
+				vec3 pos_from_mesh_origin = vec3(bpos) - vec3(SIZE / 2 + 0.5);
 				for (int facenr = 0; facenr < 6; facenr++) {
-					const Block *neighbor = map->getBlockRelativePos(this, pos + (vec3)face_dir[facenr]);
-					if (neighbor && ! neighbor->getDef()->drawable) {
+					ivec3 npos = bpos + face_dir[facenr];
+					const Block *neighbor_own, *neighbor;
+					neighbor_own = neighbor = getBlockNoEx(npos);
+					if (! neighbor)
+						neighbor = map->getBlock(pos * SIZE + npos);
+					if (neighbor && ! neighbor->getDef()->drawable)
+						any_drawable_block = true;
+					if (! mesh_created_before)
+						neighbor = neighbor_own;
+					if (! mesh_created_before && ! neighbor || neighbor && ! neighbor->getDef()->drawable) {
 						textures.push_back(def->tiles[facenr]);
 						for (int vertex_index = 0; vertex_index < 6; vertex_index++) {
 							for (int attribute_index = 0; attribute_index < 5; attribute_index++) {
@@ -89,46 +122,53 @@ void Chunk::updateMesh()
 			}
 		}
 	}
-
-	bool is_new = ! deleteMesh();
 	
-	if (textures.size() == 0) {
+	if (! any_drawable_block) {
+		if (! mesh_created_before) {
+			afterEffect();
+		} else if (mesh) {
+			mesh->reset();
+		}
 		return;
 	}
-
-	mesh = new Mesh(scene);
+	
+	if (! mesh) {
+		mesh = new Mesh(scene);
+	} else {
+		mesh->reset();
+	}
 	mesh->pos = pos * SIZE + SIZE / 2;
-	mesh->size = vec3(1.0);
-	mesh->configureVertexObjects(&vertices[0], vertices.size() * sizeof(GLfloat));
+	mesh->vertexConfig(&vertices[0], vertices.size() * sizeof(GLfloat));
 	mesh->textures = textures;
 	mesh->vertices_per_texture = 6;
-	if (is_new)
-		mesh->effect = Mesh::Effect::Type::FLYIN;
+	if (! mesh_created_before) {
+		mesh->effect = Mesh::Effect(Mesh::Effect::Type::FLYIN, Chunk::staticAfterEffect, this);
+	}
 	mesh->addToScene();
 }
 
-void Chunk::addMeshUpdateTask()
-{
-	mesh_gen_thread->addTask(this);
-}
-
-bool Chunk::deleteMesh()
-{
-	if (mesh) {
-		mesh->removeFromScene();
-		delete mesh;
-		mesh = nullptr;
-		return true;
-	}
-	return false;
-}
-
-Chunk::Chunk(Map *m, const glm::ivec3 &p, const Data &d, MeshGenThread *mgt, Scene *s) : map(m), data(d), pos(p), mesh_gen_thread(mgt), scene(s)
+Chunk::Chunk(Map *m, const glm::ivec3 &p, const Data &d, MeshGenMgr *mgt, Scene *s) : map(m), data(d), pos(p), mesh_gen_mgr(mgt), scene(s)
 {
 	addMeshUpdateTask();
 }
 
 Chunk::~Chunk()
 {
-	deleteMesh();
+	if (mesh) {
+		mesh->removeFromScene();
+		delete mesh;
+	}
+}
+
+void Chunk::staticAfterEffect(void *chunk)
+{
+	if (chunk) {
+		((Chunk *)chunk)->afterEffect();
+	}
+}
+
+void Chunk::afterEffect()
+{
+	effect_finished = true;
+	addMeshUpdateTaskWithEdge();
 }

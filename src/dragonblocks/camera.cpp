@@ -12,7 +12,7 @@ mat4 Camera::getViewMatrix() const
 void Camera::update(double yaw, double pitch)
 {
 	yaw = radians(yaw);
-	pitch = radians(clamp(pitch, -89.0, 89.0));
+	pitch = radians(pitch);
 	
 	m_front = normalize(vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)));
 	m_right = normalize(cross(m_front, m_world_up));

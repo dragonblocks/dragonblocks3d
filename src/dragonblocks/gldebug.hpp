@@ -2,8 +2,9 @@
 
 #include "gl.hpp"
 
-#define glCheckError() glCheckError_(__FILE__, __LINE__)
-#define CHECKERR glCheckError();
+#define CHECKERR dragonblocks::checkGLError(__FILE__, __LINE__);
 
-GLenum glCheckError_(const char *file, int line);
-
+namespace dragonblocks
+{
+	GLenum checkGLError(const char *file, int line);
+}

@@ -21,7 +21,7 @@ Client::Client()
 	Texture::bilinear_filter = false;
 	Texture::initArgs();
 	
-	render_engine = RenderEngine::create();
+	render_engine = new RenderEngine;
 	
 	render_engine->window->setSize(1250, 750);
 	render_engine->window->setPos(0, 0);
@@ -39,9 +39,15 @@ Client::Client()
 	
 	mapgen = new Mapgen;
 	
-	map = new Map(mapgen, render_engine->mesh_gen_thread, render_engine->scene);
+	map = new Map(mapgen, render_engine->mesh_gen_mgr, render_engine->scene);
 	
 	game = new Game(mapgen);
-	
+
 	log("Initialisation complete.");
+}
+
+void Client::start()
+{
+	render_engine->mesh_gen_mgr->start();
+	render_engine->loop();
 }

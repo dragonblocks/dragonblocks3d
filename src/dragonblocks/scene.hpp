@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <set>
 
 namespace dragonblocks
 {
@@ -13,10 +13,11 @@ namespace dragonblocks
 		void remove(Mesh *);
 		void render(double, ShaderProgram *);
 		void clear();
+		void run();
 
 		~Scene();
 		
 		private:
-		std::map<Mesh *, bool> list;
+		std::set<Mesh *> meshes;
 	};
 } 

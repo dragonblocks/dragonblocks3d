@@ -6,7 +6,7 @@ namespace dragonblocks
 {	
 	class Camera;
 	class InputHandler;
-	class MeshGenThread;
+	class MeshGenMgr;
 	class ShaderProgram;
 	class Scene;
 	class Window;
@@ -14,11 +14,9 @@ namespace dragonblocks
 	class RenderEngine
 	{
 		public:
-		static RenderEngine *create();
-
 		Camera *camera;
 		InputHandler *input_handler;
-		MeshGenThread *mesh_gen_thread;
+		MeshGenMgr *mesh_gen_mgr;
 		Scene *scene;
 		ShaderProgram *shader_program;
 		Window *window;
@@ -32,15 +30,12 @@ namespace dragonblocks
 		void setRenderDistance(double);
 		void setFov(double);
 		
+		RenderEngine();
 		~RenderEngine();
 		
-		private:
-		static RenderEngine *singleton;
-		
+		private:		
 		double last_time;
 		double render_distance;
 		double fov;
-		
-		RenderEngine();
 	};
 }

@@ -5,7 +5,7 @@ namespace dragonblocks
 	class Server
 	{
 		public:
-		Server();
+		void start();
 	};
 } 
  

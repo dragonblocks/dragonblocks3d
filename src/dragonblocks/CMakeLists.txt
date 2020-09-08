@@ -19,7 +19,7 @@ add_library(dragonblocks SHARED
 	map.cpp
 	mapgen.cpp
 	mesh.cpp
-	mesh_gen_thread.cpp
+	mesh_gen_mgr.cpp
 	render_engine.cpp
 	scene.cpp
 	server.cpp

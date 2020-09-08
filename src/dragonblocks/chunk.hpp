@@ -2,7 +2,7 @@
 
 #include "block.hpp"
 #include "gl.hpp"
-#include "mesh_gen_thread.hpp"
+#include "mesh_gen_mgr.hpp"
 
 #define DRAGONBLOCKS_CHUNK_SIZE 16
 
@@ -12,7 +12,7 @@ namespace dragonblocks
 	class Mesh;
 	class Scene;
 	
-	class Chunk : public MeshGenThread::MeshGenerator
+	class Chunk : public MeshGenMgr::MeshGenerator
 	{
 		public:
 		static void checkPos(const glm::ivec3 &);
@@ -32,18 +32,24 @@ namespace dragonblocks
 		void setBlock(const glm::ivec3 &, const Block &);
 		void setBlockNoEx(const glm::ivec3 &, const Block &);
 		void addMeshUpdateTask();
+		void addMeshUpdateTaskWithEdge();
 		void updateMesh();
 		
-		Chunk(Map *, const glm::ivec3 &, const Data &, MeshGenThread *, Scene *);
+		Chunk(Map *, const glm::ivec3 &, const Data &, MeshGenMgr *, Scene *);
 		~Chunk();
 		
 		private:
+		static void staticAfterEffect(void *);
+		
 		Map *map;
 		Mesh *mesh = nullptr;
-		MeshGenThread *mesh_gen_thread;
+		MeshGenMgr *mesh_gen_mgr;
 		Scene *scene;
 		Data data;
+		bool effect_finished = false;
+		bool mesh_created = false;
 		
-		bool deleteMesh();
+		void afterEffect();
+		void deleteMesh();
 	};
 }; 

@@ -1,6 +1,7 @@
 #include <stdexcept>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "gldebug.hpp"
 #include "log.hpp"
 #include "texture.hpp"
 
@@ -26,7 +27,7 @@ void Texture::initArgs()
 
 void Texture::bind() const
 {
-	glBindTexture(GL_TEXTURE_2D, id);
+	glBindTexture(GL_TEXTURE_2D, id); CHECKERR
 }
 
 void Texture::load(const string &path)
@@ -35,17 +36,17 @@ void Texture::load(const string &path)
 	unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 	if (! data)
 		throw runtime_error("Failed to load texture " + path);
-	glGenTextures(1, &id);
+	glGenTextures(1, &id); CHECKERR
 	bind();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture::min_filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Texture::mag_filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture::min_filter); CHECKERR
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Texture::mag_filter); CHECKERR
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKERR
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKERR
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); CHECKERR
 	if (Texture::mipmap)
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(GL_TEXTURE_2D); CHECKERR
 	stbi_image_free(data);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0); CHECKERR
 	log("Loaded texture " + path);
 }
 

@@ -23,6 +23,7 @@ namespace dragonblocks
 		void swapBuffers();
 		bool shouldClose() const;
 		bool wasKeyDown(int) const;
+		void makeContextCurrent() const;
 		glm::ivec2 getSize() const;
 		glm::ivec2 getCursorPos() const;
 		glm::ivec2 getCursorDelta();

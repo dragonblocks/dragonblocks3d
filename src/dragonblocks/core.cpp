@@ -15,17 +15,19 @@ extern "C" void _dragonblocks_start_client()
 {
 	gametype = Gametype::CLIENT; 
 	client = new Client();
-	client->render_engine->loop();
+	client->start();
 }
 
 extern "C" void _dragonblocks_start_server()
 {
 	gametype = Gametype::SERVER;
 	server = new Server();
+	server->start();
 }
 
 extern "C" void _dragonblocks_start_mainmenu()
 {
 	gametype = Gametype::MAINMENU;
 	mainmenu = new Mainmenu();
+	mainmenu->start();
 }

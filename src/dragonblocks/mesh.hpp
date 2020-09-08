@@ -28,35 +28,42 @@ namespace dragonblocks
 				ROTATE
 			};
 			
-			glm::mat4 getModelMatrix(double, glm::vec3, glm::vec3, glm::vec3, float, void *);
+			glm::mat4 getModelMatrix(double, glm::vec3, glm::vec3, glm::vec3, float);
 			
 			Effect() = default;
-			Effect(Type, void (*)(void *) = nullptr);
+			Effect(Type, void (*)(void *) = nullptr, void * = nullptr);
 			Effect(const Effect &) = default;
 			
 			private:
 			Type type = Type::NONE;
 			double time_left;
-			void (*on_finish)(void *) = nullptr;
+			void (*on_finish)(void *);
+			void *extra_data;
 			bool expires;
 		};
 		
 		int vertices_per_texture;
 		glm::vec3 pos, size, rotation_axis;
-		float rotation_angle = 0;
-		std::vector<Texture> textures;
-		void *extra_data = nullptr;		
+		float rotation_angle;
+		std::vector<Texture> textures;	
 		Effect effect;
 		
-		void configureVertexObjects(const GLvoid *, GLsizeiptr);
+		void reset();
+		void vertexConfig(const GLvoid *v, GLsizei s);
 		void render(double dtime, ShaderProgram *);
 		void addToScene();
 		void removeFromScene();
-	
+		void runVertexConfig();
+		
 		Mesh(Scene *);
 
 		private:
-		GLuint VAO, VBO;
+		GLuint VAO = 0, VBO = 0;
 		Scene *scene;
+		GLvoid *vertices = NULL;
+		GLsizeiptr vertices_size;
+		bool configured;
+		bool vertices_changed;
+		
 	};
 }

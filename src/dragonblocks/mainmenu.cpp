@@ -3,7 +3,7 @@
 
 using namespace dragonblocks;
 
-Mainmenu::Mainmenu()
+void Mainmenu::start()
 {
 	log("Main Menu is not available yet.");
 }
