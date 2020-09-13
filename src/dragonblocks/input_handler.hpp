@@ -12,23 +12,24 @@ namespace dragonblocks
 	{
 		public:
 		void processInput(double);
-		void processMouseInput(double);
-		void processKeyInput(double);
-		void onMouseMove(double, double, double);
-		void onKeyPress(double, std::set<int>);
 		void listenFor(int);
 		void dontListenFor(int);
+		void addMouseHandler(void (*)(double, double, double));
+		void removeMouseHandler(void (*)(double, double, double));
+		void addKeyHandler(void (*)(double, std::set<int>));
+		void removeKeyHandler(void (*)(double, std::set<int>));
 		
-		bool pitch_move;
 		double mouse_sensitivity;		
-		double yaw, pitch;
-		double speed;
+
+		InputHandler(Window *);
 		
-		InputHandler(Camera *, Window *);
+		private:
+		void processMouseInput(double);
+		void processKeyInput(double);
 		
-		private:		
-		Camera *camera;
 		Window *window;
 		std::set<int> listened_keys;
+		std::set<void (*)(double, double, double)> mouse_handlers;
+		std::set<void (*)(double, std::set<int>)> key_handlers;
 	};
 }

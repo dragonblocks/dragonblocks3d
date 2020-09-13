@@ -15,14 +15,13 @@ add_library(dragonblocks SHARED
 	gldebug.cpp
 	input_handler.cpp
 	log.cpp
-	mainmenu.cpp
 	map.cpp
 	mapgen.cpp
 	mesh.cpp
 	mesh_gen_mgr.cpp
+	player.cpp
 	render_engine.cpp
 	scene.cpp
-	server.cpp
 	shader_program.cpp
 	texture.cpp
 	window.cpp

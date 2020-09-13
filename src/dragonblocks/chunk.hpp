@@ -39,17 +39,16 @@ namespace dragonblocks
 		~Chunk();
 		
 		private:
-		static void staticAfterEffect(void *);
+		static void staticAfterAnimation(void *);
 		
 		Map *map;
 		Mesh *mesh = nullptr;
 		MeshGenMgr *mesh_gen_mgr;
 		Scene *scene;
 		Data data;
-		bool effect_finished = false;
+		bool animation_finished = false;
 		bool mesh_created = false;
 		
-		void afterEffect();
-		void deleteMesh();
+		void afterAnimation();
 	};
 }; 

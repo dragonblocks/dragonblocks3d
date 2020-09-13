@@ -5,6 +5,7 @@ namespace dragonblocks
 	class Game;
 	class Map;
 	class Mapgen;
+	class Player;
 	class RenderEngine;
 	
 	class Client
@@ -13,6 +14,7 @@ namespace dragonblocks
 		Game *game;
 		Map *map;
 		Mapgen *mapgen;
+		Player *player;
 		RenderEngine *render_engine;
 		
 		void start();

@@ -22,13 +22,14 @@ namespace dragonblocks
 		Window *window;
 		
 		void render();
-		void loadChunks();
-		void loop();
+		bool running();
 		void updateViewMatrix();
 		void updateProjectionMatrix();
 		void setSky(glm::vec3);
 		void setRenderDistance(double);
 		void setFov(double);
+		void startMeshGenMgr();
+		
 		
 		RenderEngine();
 		~RenderEngine();

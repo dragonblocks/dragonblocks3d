@@ -12,10 +12,51 @@ void InputHandler::processInput(double dtime)
 	processKeyInput(dtime);
 }
 
+void InputHandler::listenFor(int key)
+{
+	listened_keys.insert(key);
+}
+
+void InputHandler::dontListenFor(int key)
+{
+	listened_keys.erase(key);
+}
+
+void InputHandler::addMouseHandler(void (*callback)(double, double, double))
+{
+	mouse_handlers.insert(callback);
+}
+
+void InputHandler::removeMouseHandler(void (*callback)(double, double, double))
+{
+	mouse_handlers.erase(callback);
+}
+
+void InputHandler::addKeyHandler(void (*callback)(double, set<int>))
+{
+	key_handlers.insert(callback);
+}
+
+void InputHandler::removeKeyHandler(void (*callback)(double, set<int>))
+{
+	key_handlers.erase(callback);
+}
+
+InputHandler::InputHandler(Window *w) : window(w)
+{
+}
+
 void InputHandler::processMouseInput(double dtime)
 {
 	vec2 cursor_delta = vec2(mouse_sensitivity * dtime) * (vec2)window->getCursorDelta();
-	onMouseMove(dtime, cursor_delta.x, cursor_delta.y);
+	double x, y;
+	x = cursor_delta.x;
+	y = cursor_delta.y;
+	if (x != 0 && y != 0) {
+		for (auto it = mouse_handlers.begin(); it != mouse_handlers.end(); it++) {
+			(**it)(dtime, x, y);
+		}
+	}
 }
 
 void InputHandler::processKeyInput(double dtime)
@@ -27,59 +68,9 @@ void InputHandler::processKeyInput(double dtime)
 			keysDown.insert(key);
 		}
 	}
-	onKeyPress(dtime, keysDown);
-}
-
-void InputHandler::onMouseMove(double dtime, double x, double y)
-{
-	yaw += x;
-	pitch -= y;
-	pitch = clamp(pitch, -89.0, 89.0);
-	camera->update(yaw, pitch);
-}
-
-void InputHandler::onKeyPress(double dtime, set<int> keys)
-{
-	vec3 vel = vec3(speed * dtime);
-	vec3 front = camera->front(), right = camera->right(), up = camera->up();
-	if (! pitch_move) {
-		front = normalize(vec3(front.x, 0, front.z));
-		up = normalize(vec3(0, up.y, 0));
+	if (keysDown.begin() != keysDown.end()) {
+		for (auto it = key_handlers.begin(); it != key_handlers.end(); it++) {
+			(**it)(dtime, keysDown);
+		}
 	}
-	if (keys.find(GLFW_KEY_W) != keys.end()) {
-		camera->pos += vel * front;
-	} else if (keys.find(GLFW_KEY_S) != keys.end()) {
-		camera->pos -= vel * front;
-	}
-	if (keys.find(GLFW_KEY_D) != keys.end()) {
-		camera->pos += vel * right;
-	} else if (keys.find(GLFW_KEY_A) != keys.end()) {
-		camera->pos -= vel * right;
-	}
-	if (keys.find(GLFW_KEY_SPACE) != keys.end()) {
-		camera->pos += vel * up;
-	} else if (keys.find(GLFW_KEY_LEFT_SHIFT) != keys.end()) {
-		camera->pos -= vel * up;
-	}	
 }
-
-void InputHandler::listenFor(int key)
-{
-	listened_keys.insert(key);
-}
-
-void InputHandler::dontListenFor(int key)
-{
-	listened_keys.erase(key);
-}
-
-InputHandler::InputHandler(Camera *c, Window *w) : camera(c), window(w)
-{
-	listenFor(GLFW_KEY_W);
-	listenFor(GLFW_KEY_A);
-	listenFor(GLFW_KEY_S);
-	listenFor(GLFW_KEY_D);
-	listenFor(GLFW_KEY_SPACE);
-	listenFor(GLFW_KEY_LEFT_SHIFT);
-}
-

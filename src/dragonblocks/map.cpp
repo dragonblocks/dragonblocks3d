@@ -65,7 +65,7 @@ void Map::clear()
 	chunks.clear();
 }
 
-Map::Map(Mapgen *m, MeshGenMgr *mgt, Scene *s) : mapgen(m), mesh_gen_mgr(mgt), scene(s)
+Map::Map(Mapgen *m, MeshGenMgr *mg, Scene *s) : mapgen(m), mesh_gen_mgr(mg), scene(s)
 {
 }
 

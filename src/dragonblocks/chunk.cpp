@@ -8,6 +8,8 @@
 #include "mesh.hpp" 
 #include "texture.hpp" 
 
+#include "scene.hpp"
+
 #define SIZE DRAGONBLOCKS_CHUNK_SIZE
 
 using namespace std;
@@ -68,7 +70,7 @@ void Chunk::updateMesh()
 {
 	log(string("Update Chunk Mesh at ") + to_string(pos.x) + " " + to_string(pos.y) +  " " + to_string(pos.z));
 		
-	if (mesh_created && ! effect_finished)
+	if (mesh_created && ! animation_finished)
 		return;
 	
 	bool mesh_created_before = mesh_created;
@@ -125,29 +127,30 @@ void Chunk::updateMesh()
 	
 	if (! any_drawable_block) {
 		if (! mesh_created_before) {
-			afterEffect();
+			afterAnimation();
 		} else if (mesh) {
-			mesh->reset();
+			delete mesh;
+			mesh = nullptr;
 		}
 		return;
 	}
 	
-	if (! mesh) {
-		mesh = new Mesh(scene);
-	} else {
-		mesh->reset();
-	}
+	Mesh *oldmesh = mesh;
+	
+	mesh = new Mesh(scene, &vertices[0], vertices.size() * sizeof(GLfloat));
 	mesh->pos = pos * SIZE + SIZE / 2;
-	mesh->vertexConfig(&vertices[0], vertices.size() * sizeof(GLfloat));
 	mesh->textures = textures;
 	mesh->vertices_per_texture = 6;
 	if (! mesh_created_before) {
-		mesh->effect = Mesh::Effect(Mesh::Effect::Type::FLYIN, Chunk::staticAfterEffect, this);
+		mesh->animation = Mesh::Animation(Mesh::Animation::Type::FLYIN, Chunk::staticAfterAnimation, this);
 	}
-	mesh->addToScene();
+	
+	if (oldmesh) {
+		oldmesh->die();
+	}
 }
 
-Chunk::Chunk(Map *m, const glm::ivec3 &p, const Data &d, MeshGenMgr *mgt, Scene *s) : map(m), data(d), pos(p), mesh_gen_mgr(mgt), scene(s)
+Chunk::Chunk(Map *m, const glm::ivec3 &p, const Data &d, MeshGenMgr *mg, Scene *s) : map(m), data(d), pos(p), mesh_gen_mgr(mg), scene(s)
 {
 	addMeshUpdateTask();
 }
@@ -155,20 +158,19 @@ Chunk::Chunk(Map *m, const glm::ivec3 &p, const Data &d, MeshGenMgr *mgt, Scene 
 Chunk::~Chunk()
 {
 	if (mesh) {
-		mesh->removeFromScene();
 		delete mesh;
 	}
 }
 
-void Chunk::staticAfterEffect(void *chunk)
+void Chunk::staticAfterAnimation(void *chunk)
 {
 	if (chunk) {
-		((Chunk *)chunk)->afterEffect();
+		((Chunk *)chunk)->afterAnimation();
 	}
 }
 
-void Chunk::afterEffect()
+void Chunk::afterAnimation()
 {
-	effect_finished = true;
+	animation_finished = true;
 	addMeshUpdateTaskWithEdge();
 }

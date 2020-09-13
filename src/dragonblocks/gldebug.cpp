@@ -21,7 +21,7 @@ GLenum dragonblocks::checkGLError(const char *file, int line)
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-		log(string("OpenGL Error: ") + error + " | " + file + " (" + ")");
+		log(string("OpenGL Error: ") + error + " | " + file + " (" + to_string(line) + ")");
     }
     return errorCode;
 }

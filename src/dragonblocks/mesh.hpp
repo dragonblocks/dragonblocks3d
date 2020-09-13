@@ -12,13 +12,13 @@ namespace dragonblocks
 	class Mesh
 	{
 		public:
-		class Effect
+		class Animation
 		{
 			public:
-			static double grow_time;	// s
-			static double flyin_time;	// s
-			static double flyin_offset;	// m
-			static double rotate_speed;	// turns/s
+			static double grow_time;
+			static double flyin_time;
+			static double flyin_offset;
+			static double rotate_speed;
 			
 			enum Type
 			{
@@ -30,9 +30,9 @@ namespace dragonblocks
 			
 			glm::mat4 getModelMatrix(double, glm::vec3, glm::vec3, glm::vec3, float);
 			
-			Effect() = default;
-			Effect(Type, void (*)(void *) = nullptr, void * = nullptr);
-			Effect(const Effect &) = default;
+			Animation() = default;
+			Animation(Type, void (*)(void *) = nullptr, void * = nullptr);
+			Animation(const Animation &) = default;
 			
 			private:
 			Type type = Type::NONE;
@@ -44,26 +44,27 @@ namespace dragonblocks
 		
 		int vertices_per_texture;
 		glm::vec3 pos, size, rotation_axis;
-		float rotation_angle;
+		float rotation_angle = 0;
 		std::vector<Texture> textures;	
-		Effect effect;
+		Animation animation;		
 		
-		void reset();
-		void vertexConfig(const GLvoid *v, GLsizei s);
 		void render(double dtime, ShaderProgram *);
-		void addToScene();
-		void removeFromScene();
-		void runVertexConfig();
+		bool isRendering();
+		void die();
 		
-		Mesh(Scene *);
+		Mesh(Scene *, const GLvoid *, GLsizei);
+		~Mesh();
 
 		private:
 		GLuint VAO = 0, VBO = 0;
 		Scene *scene;
 		GLvoid *vertices = NULL;
 		GLsizeiptr vertices_size;
-		bool configured;
-		bool vertices_changed;
+		bool configured = false;
+		bool rendering = false;
+		bool prepare_death = false;
+		bool do_delete = false;
 		
+		void configure();
 	};
 }

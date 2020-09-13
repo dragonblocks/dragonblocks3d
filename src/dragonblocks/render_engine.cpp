@@ -1,11 +1,8 @@
 #include <stdexcept>
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.hpp"
-#include "client.hpp" 						// ugly, only keep until player is implemented
-#include "core.hpp" 						// this one too
 #include "gldebug.hpp"
 #include "input_handler.hpp"
-#include "map.hpp"  						// this one three
 #include "mesh_gen_mgr.hpp"
 #include "render_engine.hpp"
 #include "scene.hpp"
@@ -34,24 +31,9 @@ void RenderEngine::render()
 	glfwPollEvents(); CHECKERR
 }
 
-void RenderEngine::loadChunks()
+bool RenderEngine::running()
 {
-	ivec3 chunkp = Map::getChunkPos(camera->pos);
-	for (int x = chunkp.x - 1; x <= chunkp.x + 1; x++) {
-		for (int y = chunkp.y - 1; y < chunkp.y + 1; y++) {
-			for (int z = chunkp.z - 1; z <= chunkp.z + 1; z++) {
-				client->map->createChunk(ivec3(x, y, z));
-			}
-		}
-	}
-}
-
-void RenderEngine::loop()
-{
-	while (! window->shouldClose()) {
-		render();
-		loadChunks();
-	}
+	return ! window->shouldClose();
 }
 
 void RenderEngine::updateProjectionMatrix()
@@ -84,6 +66,11 @@ void RenderEngine::setFov(double f)
 	updateProjectionMatrix();
 }
 
+void RenderEngine::startMeshGenMgr()
+{
+	mesh_gen_mgr->start();
+}
+
 RenderEngine::RenderEngine()
 {
 	if (! glfwInit())
@@ -94,7 +81,7 @@ RenderEngine::RenderEngine()
 	
 	window = Window::create(this);
 	camera = new Camera;
-	input_handler = new InputHandler(camera, window);
+	input_handler = new InputHandler(window);
 	mesh_gen_mgr = new MeshGenMgr;
 	scene = new Scene;
 	

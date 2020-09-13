@@ -12,12 +12,6 @@ void dragonblocks::log(const string &l)
 		case Gametype::CLIENT:
 		gt = "Client";
 		break;
-		case Gametype::SERVER:
-		gt = "Server";
-		break;
-		case Gametype::MAINMENU:
-		gt = "Mainmenu";
-		break;
 	}
 	cout << "[" << gt << "] " << l << endl;
 }
