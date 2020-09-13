@@ -137,6 +137,8 @@ void Chunk::updateMesh()
 	
 	mesh = new Mesh(scene, &vertices[0], vertices.size() * sizeof(GLfloat));
 	mesh->pos = pos * SIZE + SIZE / 2;
+	mesh->minp = vec3(- SIZE / 2 - 1);
+	mesh->maxp = vec3(+ SIZE / 2 + 1);
 	mesh->textures = textures;
 	mesh->vertices_per_texture = 6;
 	if (! mesh_created_before) {

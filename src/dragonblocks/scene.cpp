@@ -14,12 +14,12 @@ void Scene::remove(Mesh *m)
 	meshes.erase(m);
 }
 
-void Scene::render(double dtime, ShaderProgram *shader_program)
+void Scene::render(double dtime, ShaderProgram *shader_program, Frustum *frustum)
 {
 	auto renderlist = meshes;
 	for (auto it = renderlist.begin(); it != renderlist.end(); it++) {
 		Mesh *mesh = *it;
-		mesh->render(dtime, shader_program);
+		mesh->render(dtime, shader_program, frustum);
 	}
 }
 

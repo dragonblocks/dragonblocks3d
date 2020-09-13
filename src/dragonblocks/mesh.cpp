@@ -3,6 +3,7 @@
 #include <cstring>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include "FrustumCull.h"
 #include "gldebug.hpp"
 #include "mesh.hpp"
 #include "scene.hpp"
@@ -76,7 +77,7 @@ Mesh::Animation::Animation(Mesh::Animation::Type t, void (*o)(void *), void *e) 
 	}
 }
 
-void Mesh::render(double dtime, ShaderProgram *shader_program)
+void Mesh::render(double dtime, ShaderProgram *shader_program, Frustum *frustum)
 {
 	rendering = true;
 	
@@ -94,6 +95,9 @@ void Mesh::render(double dtime, ShaderProgram *shader_program)
 	shader_program->use(); CHECKERR
 	
 	mat4 model_matrix = animation.getModelMatrix(dtime, pos, size, rotation_axis, rotation_angle); CHECKERR
+	
+	if (! frustum->IsBoxVisible(model_matrix * vec4(minp, 1.0), model_matrix * vec4(maxp, 1.0)))
+		return;
 	
 	shader_program->set("model", model_matrix); CHECKERR
 	

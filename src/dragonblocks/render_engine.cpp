@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <glm/gtc/matrix_transform.hpp>
+#include "FrustumCull.h"
 #include "camera.hpp"
 #include "gldebug.hpp"
 #include "input_handler.hpp"
@@ -21,11 +22,16 @@ void RenderEngine::render()
 	input_handler->processInput(dtime);
 	
 	glEnable(GL_DEPTH_TEST); CHECKERR
+	glEnable(GL_CULL_FACE); CHECKERR
+	glCullFace(GL_BACK); CHECKERR
+	glFrontFace(GL_CW); CHECKERR
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); CHECKERR
 
 	updateViewMatrix();	CHECKERR
 	
-	scene->render(dtime, shader_program);
+	Frustum frustum(projection_matrix * view_matrix);
+	
+	scene->render(dtime, shader_program, &frustum);
 	
 	window->swapBuffers(); CHECKERR
 	glfwPollEvents(); CHECKERR
@@ -39,13 +45,14 @@ bool RenderEngine::running()
 void RenderEngine::updateProjectionMatrix()
 {
 	dvec2 bounds = window->getSize();
-	mat4 projection_matrix = perspective(radians(fov), bounds.x / bounds.y, 0.01, render_distance);
+	projection_matrix = perspective(radians(fov), bounds.x / bounds.y, 0.01, render_distance);
 	shader_program->set("projection", projection_matrix); CHECKERR
 }
 
 void RenderEngine::updateViewMatrix()
 {
-	shader_program->set("view", camera->getViewMatrix()); CHECKERR
+	view_matrix = camera->getViewMatrix();
+	shader_program->set("view", view_matrix); CHECKERR
 }
 
 void RenderEngine::setSky(vec3 sky)

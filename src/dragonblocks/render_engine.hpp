@@ -34,7 +34,8 @@ namespace dragonblocks
 		RenderEngine();
 		~RenderEngine();
 		
-		private:		
+		private:
+		glm::mat4 view_matrix, projection_matrix;
 		double last_time;
 		double render_distance;
 		double fov;

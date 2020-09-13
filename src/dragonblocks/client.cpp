@@ -18,7 +18,7 @@ Client::Client()
 {
 	log("Initalizing...");
 	
-	Texture::mipmap = false;
+	Texture::mipmap = true;
 	Texture::bilinear_filter = false;
 	Texture::initArgs();
 	
@@ -41,8 +41,8 @@ Client::Client()
 	player = Player::createLocalplayer(render_engine->camera, render_engine->input_handler, map);
 	
 	player->pitch_move = false;
-	player->yaw = -90;
-	player->pitch = -80;
+	player->yaw = 0;
+	player->pitch = 0;
 	player->speed = 10;
 	player->pos = vec3(8, 8, 8);
 	

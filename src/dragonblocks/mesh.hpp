@@ -4,6 +4,8 @@
 #include "gl.hpp"
 #include "texture.hpp"
 
+class Frustum;
+
 namespace dragonblocks
 {
 	class Scene;
@@ -44,11 +46,12 @@ namespace dragonblocks
 		
 		int vertices_per_texture;
 		glm::vec3 pos, size, rotation_axis;
+		glm::vec3 minp, maxp;
 		float rotation_angle = 0;
 		std::vector<Texture> textures;	
 		Animation animation;		
 		
-		void render(double dtime, ShaderProgram *);
+		void render(double dtime, ShaderProgram *, Frustum *);
 		bool isRendering();
 		void die();
 		

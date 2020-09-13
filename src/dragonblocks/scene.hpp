@@ -2,6 +2,8 @@
 
 #include <set>
 
+class Frustum;
+
 namespace dragonblocks
 {
 	class Mesh;
@@ -11,7 +13,7 @@ namespace dragonblocks
 		public:
 		void add(Mesh *);
 		void remove(Mesh *);
-		void render(double, ShaderProgram *);
+		void render(double, ShaderProgram *, Frustum *);
 		void clear();
 		void run();
 
