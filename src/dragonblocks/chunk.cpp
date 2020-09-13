@@ -8,8 +8,6 @@
 #include "mesh.hpp" 
 #include "texture.hpp" 
 
-#include "scene.hpp"
-
 #define SIZE DRAGONBLOCKS_CHUNK_SIZE
 
 using namespace std;
