@@ -16,3 +16,4 @@ void main()
     gl_Position = projection * cameraRelCoords;
     ourTexCoord = aTexCoord;
 }
+
