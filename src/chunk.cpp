@@ -3,11 +3,11 @@
 #include "animations.hpp"
 #include "block_def.hpp"
 #include "box_vertices.hpp"
-#include "chunk.hpp" 
-#include "face_dir.hpp" 
-#include "map.hpp" 
-#include "mesh.hpp" 
-#include "texture.hpp" 
+#include "chunk.hpp"
+#include "face_dir.hpp"
+#include "map.hpp"
+#include "mesh.hpp"
+#include "texture.hpp"
 
 #define SIZE DRAGONBLOCKS_CHUNK_SIZE
 
@@ -68,17 +68,17 @@ void Chunk::addMeshUpdateTaskWithEdge()
 void Chunk::updateMesh()
 {
 	cout << "Update Chunk Mesh at " << pos.x << " " << pos.y << " " << pos.z << endl;
-		
+
 	if (mesh_created && ! animation_finished)
 		return;
-	
+
 	bool mesh_created_before = mesh_created;
 	mesh_created = true;
-	
+
 	vector<GLfloat> vertices;
 	vector<Texture> textures;
 	bool any_drawable_block = false;
-	
+
 	for (int x = 0; x < SIZE; x++) {
 		for (int y = 0; y < SIZE; y++) {
 			for (int z = 0; z < SIZE; z++) {
@@ -122,7 +122,7 @@ void Chunk::updateMesh()
 			}
 		}
 	}
-	
+
 	if (! any_drawable_block) {
 		if (! mesh_created_before) {
 			afterAnimation();
@@ -132,9 +132,9 @@ void Chunk::updateMesh()
 		}
 		return;
 	}
-	
+
 	Mesh *oldmesh = mesh;
-	
+
 	mesh = new Mesh(scene, shader_program, &vertices[0], vertices.size());
 	mesh->pos = pos * SIZE + SIZE / 2;
 	mesh->minp = vec3(- SIZE / 2);
@@ -142,9 +142,9 @@ void Chunk::updateMesh()
 	mesh->textures = textures;
 	mesh->vertices_per_texture = 6;
 	if (! mesh_created_before) {
-		mesh->animation = new FlyInAnimation(0.4, 20.0, Chunk::staticAfterAnimation, this);
+		mesh->animation = new GrowAnimation(0.25, Chunk::staticAfterAnimation, this);
 	}
-	
+
 	if (oldmesh) {
 		oldmesh->die();
 	}
